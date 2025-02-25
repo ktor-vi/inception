@@ -31,8 +31,8 @@ services:
       - /home/vphilipp/data/wordpress:/var/www/html  
     networks:
       - wordpress-network
-    expose: 
-      - 9000
+    ports: 
+      - "9000"
   nginx:
     build:
       context: ./requirements/nginx  

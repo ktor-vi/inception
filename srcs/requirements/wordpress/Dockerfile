@@ -2,7 +2,7 @@ FROM debian:oldstable
 
 # Installer PHP et les extensions nécessaires
 RUN apt-get update && \
-    apt-get install -y wget php php-fpm php-mysqli php-curl php-xml php-mbstring && \
+    apt-get install -y wget php php-fpm mariadb-client php-mysqli php-curl php-xml php-mbstring && \
     rm -rf /var/lib/apt/lists/*
 
 # Télécharger et extraire WordPress dans /tmp
@@ -16,6 +16,7 @@ RUN mkdir -p /run/php
 # Copier le script d'entrée
 COPY ./tools/entrypoint.sh /entrypoint.sh
 COPY ./tools/www.conf /etc/php/7.4/fpm/pool.d/ 
+
 RUN chmod +x /entrypoint.sh
 
 EXPOSE 9000
