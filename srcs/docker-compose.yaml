@@ -3,18 +3,13 @@ services:
     build:
       context: ./requirements/mariadb  
     restart: always
-    environment:
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
-      MYSQL_DATABASE: ${MYSQL_DATABASE}
-      MYSQL_USER: ${MYSQL_USER}
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
     volumes:
-      - /home/vphilipp/data/mariadb:/var/lib/mysql  
+      - mariadb:/var/lib/mysql  
     networks:
       - wordpress-network
     ports: 
       - "3306"
-    # No healthcheck for now
+    env_file: .env
   
   wordpress:
     build:
@@ -22,17 +17,14 @@ services:
     restart: always
     depends_on:
       - mariadb
-    environment:
-      WORDPRESS_DB_HOST: mariadb
-      WORDPRESS_DB_NAME: ${WORDPRESS_DB_NAME}
-      WORDPRESS_DB_USER: ${WORDPRESS_DB_USER}
-      WORDPRESS_DB_PASSWORD: ${WORDPRESS_DB_PASSWORD}
     volumes:
-      - /home/vphilipp/data/wordpress:/var/www/html  
+      - wordpress:/var/www/html  
     networks:
       - wordpress-network
     ports: 
       - "9000"
+    env_file: .env
+
   nginx:
     build:
       context: ./requirements/nginx  
@@ -41,11 +33,25 @@ services:
       - wordpress
     ports:
       - "443:443" 
-    volumes:
-      - /home/vphilipp/data/wordpress:/var/www/html 
     networks:
       - wordpress-network
+    volumes: 
+      - wordpress:/var/www/html
+    env_file: .env
 
 networks:
   wordpress-network:
     driver: bridge
+volumes: 
+  wordpress:
+    driver: local
+    driver_opts: 
+      type: none
+      o: bind
+      device: /home/vphilipp/data/wordpress
+  mariadb:
+    driver: local
+    driver_opts: 
+      type: none
+      o: bind
+      device: /home/vphilipp/data/mariadb
